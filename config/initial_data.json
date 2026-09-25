@@ -1,0 +1,41 @@
+{
+  "locations": [
+    {"kind":"CITY","name_en":"Abu Dhabi","name_ar":"أبوظبي","slug":"abu-dhabi"},
+    {"kind":"AREA","name_en":"Musaffah","name_ar":"مصفح","slug":"musaffah","parent":"abu-dhabi"},
+    {"kind":"AREA","name_en":"ICAD","name_ar":"مدينة أبوظبي الصناعية","slug":"icad","parent":"abu-dhabi"},
+    {"kind":"ZONE","name_en":"M1","name_ar":"M1","slug":"m1","parent":"musaffah"},
+    {"kind":"ZONE","name_en":"M6","name_ar":"M6","slug":"m6","parent":"musaffah"},
+    {"kind":"ZONE","name_en":"M9","name_ar":"M9","slug":"m9","parent":"musaffah"},
+    {"kind":"ZONE","name_en":"M10","name_ar":"M10","slug":"m10","parent":"musaffah"},
+    {"kind":"ZONE","name_en":"M11","name_ar":"M11","slug":"m11","parent":"musaffah"},
+    {"kind":"ZONE","name_en":"M12","name_ar":"M12","slug":"m12","parent":"musaffah"},
+    {"kind":"ZONE","name_en":"M14","name_ar":"M14","slug":"m14","parent":"musaffah"},
+    {"kind":"ZONE","name_en":"M15","name_ar":"M15","slug":"m15","parent":"musaffah"},
+    {"kind":"ZONE","name_en":"M16","name_ar":"M16","slug":"m16","parent":"musaffah"},
+    {"kind":"ZONE","name_en":"M17","name_ar":"M17","slug":"m17","parent":"musaffah"},
+    {"kind":"ZONE","name_en":"M18","name_ar":"M18","slug":"m18","parent":"musaffah"},
+    {"kind":"ZONE","name_en":"M26","name_ar":"M26","slug":"m26","parent":"musaffah"},
+    {"kind":"ZONE","name_en":"ICAD I","name_ar":"ICAD I","slug":"icad-i","parent":"icad"},
+    {"kind":"ZONE","name_en":"ICAD II","name_ar":"ICAD II","slug":"icad-ii","parent":"icad"},
+    {"kind":"ZONE","name_en":"ICAD III","name_ar":"ICAD III","slug":"icad-iii","parent":"icad"},
+    {"kind":"ZONE","name_en":"ICAD V","name_ar":"ICAD V","slug":"icad-v","parent":"icad"},
+    {"kind":"ZONE","name_en":"Other / Not listed","name_ar":"أخرى / غير مدرج","slug":"other","parent":"abu-dhabi"}
+  ],
+  "taxonomies": {
+    "CATEGORY": ["Furniture","Marine","Automotive","Electronics","Household","Scrap","Industrial","Construction","Food","Daily Services","Other / Not listed"],
+    "SUBCATEGORY": ["Used goods","Boat services","Auto parts","Home goods","Restaurant equipment","Other / Not listed"],
+    "ACTIVITY": [
+      "Sell new furniture","Sell used furniture","Buy used furniture","Buy and sell used furniture","Furniture repair","Furniture moving","Furniture disposal",
+      "Boat sales","Buy used boats","Buy damaged boats","Boat repair","Fiberglass repair","Boat removal","Boat transport",
+      "Buy used items","Buy damaged items","Buy scrap","Repair items","Remove items","Donate items","Item exchange","Item transport","Item collection","Other / Not listed"
+    ],
+    "ITEM_TYPE": ["Furniture","Curtains","Kitchenware","Shoes","Bags","Toys","Kids bicycles","Electronics","Appliances","Boats","Cars","Machinery","Tools","Restaurant equipment","Scrap","Building materials","Other / Not listed"],
+    "CONDITION": ["New","Used","Old","Damaged","Broken","Scrap","Other / Not listed"],
+    "USER_INTENT": ["Buy","Sell","Repair","Remove","Dispose","Donate","Exchange","Transport","Collect","Other / Not listed"],
+    "SERVICE": ["Home pickup","Onsite service","Removal","Repair","Transport","Delivery","Other / Not listed"],
+    "PRODUCT": ["Furniture","Boat","Car","Machinery","Tools","Restaurant equipment","Spare parts","Other / Not listed"],
+    "LANGUAGE": ["Arabic","English","Urdu","Hindi","Malayalam","Bengali","Tamil","Punjabi","Pashto","Nepali","Tagalog","Other / Not listed"],
+    "CAPABILITY": ["buys_from_customers","sells_to_customers","buys_used_items","buys_damaged_items","buys_scrap","repairs_items","removes_items","home_pickup","onsite_service","free_pickup","paid_pickup","delivery_available","transport_available","Other / Not listed"],
+    "TAG": ["Verified","Open now","Near me","Fast response","Other / Not listed"]
+  }
+}

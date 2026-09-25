@@ -1,0 +1,23 @@
+[Unit]
+Description=MASFAH Next.js Beta application
+After=network.target
+
+[Service]
+Type=simple
+User=masfah
+Group=masfah
+WorkingDirectory=/opt/masfah/current
+EnvironmentFile=/etc/masfah/masfah.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/npm run start:production
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+ReadWritePaths=/opt/masfah/current
+
+[Install]
+WantedBy=multi-user.target

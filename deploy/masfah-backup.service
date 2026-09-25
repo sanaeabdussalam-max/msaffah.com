@@ -1,0 +1,10 @@
+[Unit]
+Description=MASFAH encrypted PostgreSQL backup
+
+[Service]
+Type=oneshot
+User=masfah
+Group=masfah
+WorkingDirectory=/opt/masfah/current
+EnvironmentFile=/etc/masfah/masfah.env
+ExecStart=/opt/masfah/current/deploy/backup-postgres.sh
