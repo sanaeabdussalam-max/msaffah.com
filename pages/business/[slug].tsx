@@ -1,0 +1,17 @@
+import type { GetServerSideProps, InferGetServerSidePropsType } from 'next';
+import Head from 'next/head';
+import Link from 'next/link';
+import { prisma } from '../../lib/prisma';
+import { findPublishedBusinessContent } from '../../lib/business-content-repository';
+
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+  const slug = typeof params?.slug === 'string' ? params.slug : '';
+  const business = await prisma.business.findUnique({ where: { slug }, select: { id: true, slug: true, nameEn: true, nameAr: true, descriptionEn: true, descriptionAr: true, isVerified: true, publicationStatus: true } });
+  if (!business || business.publicationStatus !== 'PUBLISHED') return { notFound: true };
+  const content = await findPublishedBusinessContent(business.id);
+  return { props: { business: JSON.parse(JSON.stringify(business)), content: JSON.parse(JSON.stringify(content)) } };
+};
+
+export default function BusinessProfile({ business, content }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  return <><Head><title>{business.nameEn} | MASFAH</title></Head><main className="mx-auto max-w-6xl p-6" dir="auto"><header className="mb-10"><p className="text-sm text-blue-700">{business.isVerified ? 'Verified business' : 'Business profile'}</p><h1 className="text-4xl font-black">{business.nameEn} · {business.nameAr}</h1><p className="mt-3 text-gray-600">{business.descriptionEn || business.descriptionAr}</p><Link href={`/business/${business.slug}/dashboard`} className="mt-5 inline-block rounded-lg bg-black px-4 py-3 text-white">Business owner dashboard</Link></header><section className="mb-10"><h2 className="mb-4 text-2xl font-bold">Gallery <span className="text-sm text-gray-400">{content.gallery.length}</span></h2><div className="grid grid-cols-2 gap-4 md:grid-cols-4">{content.gallery.map((item: any) => <figure key={item.id} className="overflow-hidden rounded-xl border"><img src={item.publicUrl || '/placeholder.svg'} alt={item.altText || business.nameEn} className="h-40 w-full object-cover" /></figure>)}{!content.gallery.length && <p className="text-gray-500">No published gallery items yet.</p>}</div></section><section className="mb-10"><h2 className="mb-4 text-2xl font-bold">Projects / Latest Work</h2><div className="grid gap-4 md:grid-cols-2">{content.projects.map((project: any) => <article key={project.id} className="rounded-xl border p-5"><p className="text-xs text-blue-700">{project.projectDate ? new Date(project.projectDate).toLocaleDateString() : 'Latest work'}</p><h3 className="mt-2 text-xl font-bold">{project.titleEn}</h3><p className="mt-2 text-gray-600">{project.descriptionEn}</p><div className="mt-4 grid grid-cols-2 gap-2">{project.media.map((item: any) => <img key={item.id} src={item.publicUrl || '/placeholder.svg'} alt={item.altText || project.titleEn} className="h-28 w-full rounded-lg object-cover" />)}</div></article>)}{!content.projects.length && <p className="text-gray-500">No published projects yet.</p>}</div></section><section><h2 className="mb-4 text-2xl font-bold">Business Updates</h2><div className="space-y-4">{content.updates.map((update: any) => <article key={update.id} className="rounded-xl border p-5"><p className="text-xs text-gray-500">{update.publishedAt ? new Date(update.publishedAt).toLocaleDateString() : ''}</p><h3 className="text-xl font-bold">{update.titleEn}</h3><p className="mt-2 text-gray-700">{update.bodyEn}</p></article>)}{!content.updates.length && <p className="text-gray-500">No published updates yet.</p>}</div></section></main></>;
+}

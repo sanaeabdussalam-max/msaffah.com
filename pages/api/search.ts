@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { parseSearchIntent } from '../../lib/ai-search';
 import { matchBusinesses } from '../../lib/search-matching';
 import { findPublishedBusinesses } from '../../lib/supabase-public-repository';
+import { recordSearchEvent } from '../../lib/search-learning';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') return res.status(405).json({ message: 'Method not allowed' });
@@ -11,7 +12,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const intent = await parseSearchIntent(q);
     const businesses = await findPublishedBusinesses();
-    const results = matchBusinesses(intent, businesses);
+    const results = matchBusinesses(intent, businesses, q);
+    await recordSearchEvent({ query: q, resultCount: results.length, sessionKey: typeof req.headers['x-search-session'] === 'string' ? req.headers['x-search-session'] : undefined, userAgent: req.headers['user-agent'] });
     return res.status(200).json({ intent, results, total: results.length });
   } catch (error) {
     console.error('Search error:', error);

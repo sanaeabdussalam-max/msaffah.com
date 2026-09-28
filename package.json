@@ -12,6 +12,8 @@
     "prisma:validate": "prisma validate",
     "prisma:generate": "prisma generate",
     "test:search": "tsx tests/search-flow.test.ts",
+    "test:search-learning": "tsx tests/local-search-learning.test.ts",
+    "test:business-content": "tsx tests/business-content.test.ts",
     "test:whatsapp": "tsx tests/whatsapp-assistant.test.ts"
   },
   "dependencies": {
