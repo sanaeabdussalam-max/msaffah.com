@@ -1,0 +1,8 @@
+import { useState } from 'react';
+import Head from 'next/head';
+
+export default function SearchLearningAdmin() {
+  const [token, setToken] = useState(''); const [items, setItems] = useState<any[]>([]); const [status, setStatus] = useState('Enter the admin API token.');
+  const load = async () => { const response = await fetch('/api/admin/search-learning', { headers: { Authorization: `Bearer ${token}` } }); const data = await response.json(); if (!response.ok) return setStatus(data.message || 'Could not load learning'); setItems(data); setStatus(`Loaded ${data.length} learning candidates.`); };
+  return <><Head><title>Search Learning | MASFAH Admin</title></Head><main className="mx-auto max-w-5xl p-6"><h1 className="text-3xl font-black">Search learning review</h1><p className="mt-2 text-gray-600">Candidates require minimum interactions, unique sessions, and confidence before approval.</p><div className="mt-6 flex gap-2"><input type="password" value={token} onChange={(event) => setToken(event.target.value)} placeholder="Admin API token" className="flex-1 rounded-lg border p-3" /><button onClick={load} className="rounded-lg bg-black px-4 py-3 font-bold text-white">Load</button></div><p className="mt-4 rounded-lg bg-blue-50 p-3 text-blue-800">{status}</p><div className="mt-6 space-y-3">{items.map((item) => <article key={item.normalizedQuery} className="rounded-xl border p-4"><div className="flex justify-between gap-4"><b>{item.normalizedQuery}</b><span>{item.eligible ? 'Eligible' : 'Below threshold'}</span></div><p className="mt-2 text-sm text-gray-600">Interactions: {item.interactions} · Confidence: {item.confidenceScore}</p></article>)}{!items.length && <p className="text-gray-500">No candidates loaded.</p>}</div></main></>;
+}

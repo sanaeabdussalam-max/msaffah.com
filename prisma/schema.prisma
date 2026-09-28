@@ -112,6 +112,10 @@ model Business {
   quotes          QuoteResponse[]
   reviews         Review[]
   claims          BusinessClaim[]
+  projects        BusinessProject[]
+  updates         BusinessUpdate[]
+  mediaAssets     BusinessMediaAsset[]
+  mediaReports    BusinessMediaReport[]
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
 }
@@ -305,4 +309,122 @@ model HumanHandoff {
   resolvedAt     DateTime?
 
   @@index([status, requestedAt])
+}
+
+model SearchEvent {
+  id                 String   @id @default(uuid())
+  rawQuery           String
+  normalizedQuery    String
+  resultCount        Int      @default(0)
+  isZeroResult       Boolean  @default(false)
+  sessionKey         String?
+  userAgentHash      String?
+  selectedBusinessId String?
+  selections         SearchSelection[]
+  createdAt          DateTime @default(now())
+  @@index([normalizedQuery, createdAt])
+  @@index([isZeroResult, createdAt])
+}
+
+model SearchSelection {
+  id            String      @id @default(uuid())
+  searchEventId String
+  searchEvent   SearchEvent @relation(fields: [searchEventId], references: [id], onDelete: Cascade)
+  businessId    String
+  createdAt     DateTime    @default(now())
+  @@index([businessId, createdAt])
+}
+
+model SearchLearningSuggestion {
+  id               String   @id @default(uuid())
+  normalizedQuery  String
+  suggestedAlias   String?
+  interactions     Int      @default(0)
+  uniqueSessions   Int      @default(0)
+  confidenceScore  Float    @default(0)
+  status           String   @default("PENDING")
+  reviewerNote     String?
+  reviewedAt       DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  @@unique([normalizedQuery, suggestedAlias])
+  @@index([status, confidenceScore])
+}
+
+model BusinessProject {
+  id                 String   @id @default(uuid())
+  businessId         String
+  business            Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  ownerId             String
+  titleEn             String
+  titleAr             String?
+  descriptionEn      String?
+  descriptionAr      String?
+  categoryTaxonomyId String?
+  serviceTaxonomyId  String?
+  projectDate        DateTime?
+  areaLabel          String?
+  status              String   @default("DRAFT")
+  media              BusinessMediaAsset[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  @@index([businessId, status, projectDate])
+}
+
+model BusinessUpdate {
+  id          String   @id @default(uuid())
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  ownerId     String
+  titleEn     String
+  titleAr     String?
+  bodyEn      String
+  bodyAr      String?
+  status      String   @default("DRAFT")
+  publishedAt DateTime?
+  media       BusinessMediaAsset[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@index([businessId, status, publishedAt])
+}
+
+model BusinessMediaAsset {
+  id                 String          @id @default(uuid())
+  businessId         String
+  business            Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  projectId          String?
+  project            BusinessProject? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  updateId           String?
+  update             BusinessUpdate? @relation(fields: [updateId], references: [id], onDelete: Cascade)
+  uploadedBy         String
+  provider            String          @default("PENDING_PROVIDER")
+  storageKey         String
+  publicUrl          String?
+  contentType        String
+  fileSize           Int
+  usageType          String          @default("GALLERY")
+  altText            String?
+  sortOrder          Int             @default(0)
+  permissionConfirmed Boolean         @default(false)
+  status             String          @default("DRAFT")
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  reports            BusinessMediaReport[]
+  @@index([businessId, status, usageType])
+}
+
+model BusinessMediaReport {
+  id          String             @id @default(uuid())
+  businessId  String
+  business   Business           @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  mediaId    String
+  media      BusinessMediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  reporterId String?
+  reason     String
+  details    String?
+  status     String             @default("OPEN")
+  reviewerNote String?
+  reviewedAt DateTime?
+  createdAt  DateTime           @default(now())
+  @@index([status, createdAt])
 }

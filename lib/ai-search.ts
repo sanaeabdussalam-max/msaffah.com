@@ -67,11 +67,15 @@ const findItemType = (query: string): string | null => {
 };
 
 /** Deterministic fallback parser; replace its provider call without changing the intent contract. */
+import { expandSearchTerms, normalizeSearchText } from './search-normalization';
+
 export async function parseSearchIntent(query: string): Promise<SearchIntent> {
   const normalized = query.trim();
+  const expanded = expandSearchTerms(query).join(' ');
   const explicitSell = /buy|buys|buyer|sell|selling|يشتر|أشتري|يشتري|يبيع/i.test(normalized);
-  const explicitRemove = /remove|dispose|take away|collect|collection|pickup|pick up|من البيت|استلام|يشيل|ياخذ|يتخلص|يلم/i.test(normalized);
+  const explicitRemove = /remove|dispose|take away|collect|collection|pickup|pick up|من البيت|استلام|يشيل|ياخذ|يتخلص|يلم|يجي البيت|ييون البيت/i.test(normalized);
   const repair = /repair|fix|تصليح|يصلح|إصلاح/i.test(normalized);
+  const synonymCategory = /boat|marine|قارب|قوارب|بوت|بحري/i.test(expanded) ? 'Marine' : /garage|workshop|كراج|جراج|ورشة/i.test(expanded) ? 'Automotive' : /tyre|tire|تاير|تواير|إطارات/i.test(expanded) ? 'Automotive' : /scrap|سكراب|خردة/i.test(expanded) ? 'Scrap' : /aluminium|aluminum|المنيوم|ألمنيوم/i.test(expanded) ? 'Building & Materials' : null;
   const pickup = explicitRemove;
   const used = /used|old|second hand|مستعمل|قديم|خردة|سكراب/i.test(normalized);
   const broken = /broken|damaged|مكسور|خربان|تالف/i.test(normalized);
@@ -87,7 +91,7 @@ export async function parseSearchIntent(query: string): Promise<SearchIntent> {
   ];
 
   return {
-    category: /boat|marine|قارب|قوارب|بحرية/i.test(normalized) ? 'Marine' : null,
+    category: synonymCategory || (/boat|marine|قارب|قوارب|بحرية/i.test(normalized) ? 'Marine' : null),
     subcategory: null,
     business_activity: explicitSell ? (used ? 'Buy used items' : 'Buy items') : repair ? 'Repair items' : pickup ? 'Item removal' : null,
     item_type: itemType,
@@ -103,7 +107,7 @@ export async function parseSearchIntent(query: string): Promise<SearchIntent> {
     distance_km: null,
     language: /urdu|أردو|اردو/i.test(normalized) ? 'Urdu' : null,
     price_level: /cheap|رخيص/i.test(normalized) ? 1 : null,
-    confidence: itemType || userIntent ? 0.78 : 0.35,
+    confidence: itemType || userIntent || synonymCategory ? 0.78 : 0.35,
     needs_clarification: itemType && userIntent ? [] : ['Confirm item and required action'],
   };
 }
