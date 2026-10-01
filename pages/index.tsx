@@ -6,6 +6,7 @@ const HomePage = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [searchSummary, setSearchSummary] = useState<string | null>(null);
   const [results, setResults] = useState<Array<{ id: string; name: string; category?: string; location?: string; matchScore: number; matchedOn: string[] }>>([]);
+  const [relatedSuggestions, setRelatedSuggestions] = useState<Array<{ label: string; query: string }>>([]);
   const [searchError, setSearchError] = useState<string | null>(null);
 
   const runSearch = async () => {
@@ -14,6 +15,7 @@ const HomePage = () => {
     setSearchSummary(null);
     setSearchError(null);
     setResults([]);
+    setRelatedSuggestions([]);
     try {
       const response = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
       const data = await response.json();
@@ -21,6 +23,7 @@ const HomePage = () => {
       const intent = data.intent;
       setSearchSummary(intent ? `Understood: ${[intent.item_type, intent.item_condition, intent.user_intent, ...(intent.required_capabilities || []), intent.zone].filter(Boolean).join(' · ')}` : null);
       setResults(data.results || []);
+      setRelatedSuggestions(data.relatedSuggestions || []);
     } catch (error) {
       setSearchError(error instanceof Error ? error.message : 'Search failed');
     } finally {
@@ -83,6 +86,7 @@ const HomePage = () => {
         {searchSummary && <p className="mt-5 text-sm text-blue-700 bg-blue-50 rounded-xl px-4 py-3">{searchSummary}</p>}
         {searchError && <p className="mt-5 text-sm text-red-700 bg-red-50 rounded-xl px-4 py-3">{searchError}</p>}
         {results.length > 0 && <div className="mt-8 text-left space-y-3">{results.map((result) => <article key={result.id} className="border rounded-2xl p-5 bg-white shadow-sm"><div className="flex justify-between gap-4"><div><h2 className="font-bold text-lg">{result.name}</h2><p className="text-sm text-gray-500">{[result.category, result.location].filter(Boolean).join(' · ')}</p></div><span className="text-sm font-bold text-blue-700">{result.matchScore} match</span></div><p className="text-xs text-gray-400 mt-2">Matched on: {result.matchedOn.join(', ') || 'published listing'}</p></article>)}</div>}
+        {relatedSuggestions.length > 0 && <div className="mt-8 rounded-2xl border border-blue-100 bg-blue-50 p-5 text-left"><p className="font-bold text-blue-900">ما حصلنا خدمة مطابقة بالضبط. جرّب خدمات بحرية قريبة:</p><div className="mt-3 flex flex-wrap gap-2">{relatedSuggestions.map((suggestion) => <button key={suggestion.query} onClick={() => setSearchQuery(suggestion.query)} className="rounded-full bg-white px-4 py-2 text-sm text-blue-800 shadow-sm">{suggestion.label}</button>)}</div></div>}
 
         {/* Examples Section */}
         <div className="mt-12">

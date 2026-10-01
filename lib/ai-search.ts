@@ -57,11 +57,11 @@ export interface SearchIntent {
 
 const findItemType = (query: string): string | null => {
   const itemTypes: Array<[string, RegExp]> = [
-    ['Boat', /boat|قارب|قوارب/i], ['Curtains', /curtain|ستائر/i], ['Kitchenware', /kitchenware|أدوات مطبخ/i],
+    ['Boat', /boat|قارب|قوارب|بوت|بحري/i], ['Pontoon', /pontoon|عوامة|عوامات/i], ['Curtains', /curtain|ستائر/i], ['Kitchenware', /kitchenware|أدوات مطبخ/i],
     ['Kids bicycles', /kids?\s*bicycles?|دراجات أطفال/i], ['Shoes', /shoes?|أحذية/i], ['Bags', /bags?|شنط/i],
     ['Furniture', /furniture|أثاث/i], ['Restaurant equipment', /restaurant equipment|معدات مطاعم/i],
     ['Car', /car|سيارة/i], ['Electronics', /electronics?|إلكترونيات/i], ['Appliances', /appliances?|أجهزة/i],
-    ['Scrap', /scrap|خردة|سكراب/i],
+    ['Scrap', /scrap|خردة|خرده|خرد|سكراب/i],
   ];
   return itemTypes.find(([, pattern]) => pattern.test(query))?.[0] ?? null;
 };
@@ -72,10 +72,11 @@ import { expandSearchTerms, normalizeSearchText } from './search-normalization';
 export async function parseSearchIntent(query: string): Promise<SearchIntent> {
   const normalized = query.trim();
   const expanded = expandSearchTerms(query).join(' ');
-  const explicitSell = /buy|buys|buyer|sell|selling|يشتر|أشتري|يشتري|يبيع/i.test(normalized);
-  const explicitRemove = /remove|dispose|take away|collect|collection|pickup|pick up|من البيت|استلام|يشيل|ياخذ|يتخلص|يلم|يجي البيت|ييون البيت/i.test(normalized);
-  const repair = /repair|fix|تصليح|يصلح|إصلاح/i.test(normalized);
-  const synonymCategory = /boat|marine|قارب|قوارب|بوت|بحري/i.test(expanded) ? 'Marine' : /garage|workshop|كراج|جراج|ورشة/i.test(expanded) ? 'Automotive' : /tyre|tire|تاير|تواير|إطارات/i.test(expanded) ? 'Automotive' : /scrap|سكراب|خردة/i.test(expanded) ? 'Scrap' : /aluminium|aluminum|المنيوم|ألمنيوم/i.test(expanded) ? 'Building & Materials' : null;
+  const explicitSell = /buy|buys|buyer|sell|selling|يشتر|أشتري|يشتري|يبيع|أبا حد يشتري|ابا حد يشتري|أبغي حد يشتري|ابغي حد يشتري|وين أبيع|أبا أبيع|ابا ابيع/i.test(normalized);
+  const explicitRemove = /remove|dispose|take away|collect|collection|pickup|pick up|من البيت|استلام|يشيل|ياخذ|يتخلص|يلم|يجي البيت|ييون البيت|يستلم/i.test(normalized);
+  const repair = /repair|fix|تصليح|يصلح|إصلاح|يصلحون/i.test(normalized);
+  const pontoonRequest = /pontoon|عوامة|عوامات/i.test(expanded);
+  const synonymCategory = pontoonRequest ? 'Marine' : /boat|marine|قارب|قوارب|بوت|بحري/i.test(expanded) ? 'Marine' : /garage|workshop|كراج|جراج|ورشة|auto repair/i.test(expanded) ? 'Automotive' : /tyre|tire|تاير|تواير|إطارات/i.test(expanded) ? 'Tyres' : /scrap|سكراب|خردة|خرده|خرد/i.test(expanded) ? 'Scrap' : /aluminium|aluminum|المنيوم|ألمنيوم/i.test(expanded) ? 'Aluminium' : /towing|recovery|ونش|سطحة|سحب|قطر/i.test(expanded) ? 'Transport & Recovery' : null;
   const pickup = explicitRemove;
   const used = /used|old|second hand|مستعمل|قديم|خردة|سكراب/i.test(normalized);
   const broken = /broken|damaged|مكسور|خربان|تالف/i.test(normalized);
@@ -94,8 +95,8 @@ export async function parseSearchIntent(query: string): Promise<SearchIntent> {
     category: synonymCategory || (/boat|marine|قارب|قوارب|بحرية/i.test(normalized) ? 'Marine' : null),
     subcategory: null,
     business_activity: explicitSell ? (used ? 'Buy used items' : 'Buy items') : repair ? 'Repair items' : pickup ? 'Item removal' : null,
-    item_type: itemType,
-    item_condition: broken ? 'Broken' : used ? 'Used' : null,
+     item_type: pontoonRequest ? 'Pontoon' : itemType,
+     item_condition: broken ? 'Broken' : used ? 'Used' : null,
     user_intent: userIntent,
     required_capabilities: capabilities,
     service: repair ? 'Repair' : null,

@@ -6,7 +6,9 @@ export interface BusinessForMatching {
   name: string;
   nameAr?: string;
   description?: string;
+  sourceUrl?: string;
   keywords?: string[];
+  searchCategories?: string[];
   category?: string;
   activities?: string[];
   itemTypes?: string[];
@@ -40,7 +42,7 @@ export function matchBusinesses(intent: SearchIntent, businesses: BusinessForMat
   return businesses
     .map((business) => {
       const matchedOn: string[] = [];
-      const searchable = [business.name, business.nameAr, business.description, business.category, business.location, business.zone, ...(business.activities || []), ...(business.itemTypes || []), ...(business.conditions || []), ...(business.capabilities || []), ...(business.keywords || [])];
+      const searchable = [business.name, business.nameAr, business.description, business.category, ...(business.searchCategories || []), business.location, business.zone, ...(business.activities || []), ...(business.itemTypes || []), ...(business.conditions || []), ...(business.capabilities || []), ...(business.keywords || [])];
       let score = 0;
       const has = (values: string[] | undefined, wanted: string | null) => Boolean(wanted && values?.some((value) => fieldContains([value], wanted)));
 
@@ -48,7 +50,7 @@ export function matchBusinesses(intent: SearchIntent, businesses: BusinessForMat
       if (has(business.itemTypes, intent.item_type)) { score += 35; matchedOn.push('item type'); }
       if (has(business.conditions, intent.item_condition)) { score += 20; matchedOn.push('condition'); }
       if (has(business.activities, intent.business_activity) || fieldContains(business.activities || [], intent.service || '')) { score += 35; matchedOn.push('service/activity'); }
-      if (intent.category && fieldContains([business.category], intent.category)) { score += 30; matchedOn.push('category'); }
+      if (intent.category && fieldContains([business.category, ...(business.searchCategories || [])], intent.category)) { score += 30; matchedOn.push('category'); }
       if (intent.zone && business.zone && normalizeSearchText(business.zone) === normalizeSearchText(intent.zone)) { score += 10; matchedOn.push('zone'); }
       if (intent.open_now && business.isOpen) { score += 10; matchedOn.push('open now'); }
       if (intent.near_me && business.distanceKm !== undefined) { score += Math.max(0, 10 - business.distanceKm); matchedOn.push('near me'); }
@@ -61,6 +63,10 @@ export function matchBusinesses(intent: SearchIntent, businesses: BusinessForMat
       const missingCapabilities = intent.required_capabilities.filter((capability) => !business.capabilities.some((value) => normalizeSearchText(value).includes(normalizeSearchText(capability))));
       if (missingCapabilities.length) score -= 100;
       else if (intent.required_capabilities.length) { score += 30; matchedOn.push('required capabilities'); }
+
+      // Specific requested item types must be source-backed; a broad category is not enough.
+      const missingItemType = Boolean(intent.item_type && !has(business.itemTypes, intent.item_type));
+      if (missingItemType) score -= 120;
 
       return { ...business, matchScore: Math.round(score * 100) / 100, matchedOn, listingLabel: (business.listingType === 'SPONSORED' ? 'SPONSORED' : 'ORGANIC') as 'ORGANIC' | 'SPONSORED' };
     })

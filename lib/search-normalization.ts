@@ -6,13 +6,15 @@ export function normalizeSearchText(value: string): string {
 }
 
 export const UAE_SYNONYM_GROUPS: Array<{ canonical: string; aliases: string[] }> = [
-  { canonical: 'Boat', aliases: ['قارب', 'قوارب', 'بوت', 'boat', 'boats', 'marine', 'بحري'] },
-  { canonical: 'Garage', aliases: ['كراج', 'جراج', 'ورشه', 'ورشة', 'garage', 'workshop', 'auto repair'] },
-  { canonical: 'Tyres', aliases: ['تاير', 'تواير', 'اطارات', 'إطارات', 'tyre', 'tyres', 'tire', 'tires'] },
-  { canonical: 'Scrap', aliases: ['سكراب', 'خرده', 'خردة', 'scrap'] },
+  { canonical: 'Boat', aliases: ['قارب', 'قوارب', 'بوت', 'boAt', 'boats', 'marine', 'بحري', 'بحرية'] },
+  { canonical: 'Boat repair', aliases: ['تصليح قارب', 'تصليح قوارب', 'إصلاح قارب', 'إصلاح قوارب', 'boat repair', 'marine repair'] },
+  { canonical: 'Pontoon', aliases: ['عوامة', 'عوامات', 'pontoon', 'pontoons'] },
+  { canonical: 'Garage', aliases: ['كراج', 'جراج', 'ورشه', 'ورشة', 'garage', 'workshop', 'auto repair', 'car repair'] },
+  { canonical: 'Tyres', aliases: ['تاير', 'تواير', 'اطارات', 'إطارات', 'الإطارات', 'tyre', 'tyres', 'tire', 'tires'] },
+  { canonical: 'Scrap', aliases: ['سكراب', 'خرده', 'خردة', 'خرد', 'scrap', 'scrap metal', 'used metal'] },
   { canonical: 'Aluminium', aliases: ['المنيوم', 'الالمنيوم', 'ألمنيوم', 'ألومنيوم', 'aluminium', 'aluminum'] },
   { canonical: 'Spare parts', aliases: ['قطع غيار', 'سبير بارت', 'spare parts', 'auto parts'] },
-  { canonical: 'Towing', aliases: ['ونش', 'ريكفري', 'recovery', 'towing'] },
+  { canonical: 'Towing', aliases: ['ونش', 'سطحة', 'سحب', 'قطر', 'ريكفري', 'recovery', 'towing', 'tow truck'] },
   { canonical: 'Painting', aliases: ['صبغ', 'صبغه', 'دهان', 'paint', 'painting'] },
   { canonical: 'Carpentry', aliases: ['نجار', 'نجاره', 'نجارة', 'carpenter', 'carpentry'] },
   { canonical: 'Welding', aliases: ['حداد', 'حداده', 'حدادة', 'welding', 'fabrication'] },
